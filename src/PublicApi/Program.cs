@@ -51,7 +51,11 @@ var configSection = builder.Configuration.GetRequiredSection(BaseUrlConfiguratio
 builder.Services.Configure<BaseUrlConfiguration>(configSection);
 var baseUrlConfig = configSection.Get<BaseUrlConfiguration>();
 
-builder.Services.AddMemoryCache();
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString("RedisConnectionString");
+    options.InstanceName = builder.Configuration.GetValue<string>("RedisInstanceName") ;
+});
 
 var key = Encoding.ASCII.GetBytes(AuthorizationConstants.JWT_SECRET_KEY);
 builder.Services.AddAuthentication(config =>
