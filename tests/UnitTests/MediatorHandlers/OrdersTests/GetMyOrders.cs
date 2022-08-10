@@ -5,6 +5,7 @@ using Ardalis.Specification;
 using Microsoft.eShopWeb.ApplicationCore.Entities.OrderAggregate;
 using Microsoft.eShopWeb.ApplicationCore.Interfaces;
 using Microsoft.eShopWeb.Web.Features.MyOrders;
+using Microsoft.Extensions.Caching.Distributed;
 using Moq;
 using Xunit;
 
@@ -13,6 +14,7 @@ namespace Microsoft.eShopWeb.UnitTests.MediatorHandlers.OrdersTests;
 public class GetMyOrders
 {
     private readonly Mock<IReadRepository<Order>> _mockOrderRepository;
+    private readonly Mock<IDistributedCache> _mockCache;
 
     public GetMyOrders()
     {
@@ -22,6 +24,10 @@ public class GetMyOrders
 
         _mockOrderRepository = new Mock<IReadRepository<Order>>();
         _mockOrderRepository.Setup(x => x.ListAsync(It.IsAny<ISpecification<Order>>(), default)).ReturnsAsync(new List<Order> { order });
+
+        _mockCache = new Mock<IDistributedCache>();
+        _mockCache.Setup(x => x.GetAsync(It.IsAny<string>(), default)).ReturnsAsync(default(byte[]));
+        _mockCache.Setup(x => x.SetAsync(It.IsAny<string>(), It.IsAny<byte[]>(), It.IsAny<DistributedCacheEntryOptions>(),default));
     }
 
     [Fact]
@@ -29,7 +35,7 @@ public class GetMyOrders
     {
         var request = new eShopWeb.Web.Features.MyOrders.GetMyOrders("SomeUserName");
 
-        var handler = new GetMyOrdersHandler(_mockOrderRepository.Object);
+        var handler = new GetMyOrdersHandler(_mockOrderRepository.Object, _mockCache.Object);
 
         var result = await handler.Handle(request, CancellationToken.None);
 

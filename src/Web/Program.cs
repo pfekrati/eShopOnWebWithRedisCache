@@ -43,8 +43,13 @@ builder.Services.AddScoped<ITokenClaimsService, IdentityTokenClaimService>();
 builder.Services.AddCoreServices(builder.Configuration);
 builder.Services.AddWebServices(builder.Configuration);
 
-// Add memory cache services
-builder.Services.AddMemoryCache();
+// Add redis memory cache services
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString("RedisConnectionString");
+    options.InstanceName = builder.Configuration.GetValue<string>("RedisInstanceName");
+});
+
 builder.Services.AddRouting(options =>
 {
     // Replace the type and the name used to refer to it with your own

@@ -21,7 +21,7 @@
     },
     "resourceName": {
       "type": "string",
-      "defaultValue": "eshop-web-2",
+      "defaultValue": "eshop-web-v2",
       "metadata": {
         "description": "Name of the main resource to be created by this template."
       }
